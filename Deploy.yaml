@@ -1,0 +1,72 @@
+# 创建命名空间
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wenlvma-gateway-sso-web  # 项目空间名称
+  labels:
+    name: wenlvma-gateway-sso-web  # 标签
+---
+# 部署工作负载
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-gateway-sso-web # 负载名称
+  namespace: wenlvma-gateway-sso-web  # 所在namespace
+spec: 
+  selector: 
+    matchLabels:
+      workloadselector: deployment-wenlvma-gateway-sso-web  # 选择器 选择标签
+  replicas: 1  # pod 数量
+  template:
+    metadata:
+      labels:
+        workloadselector: deployment-wenlvma-gateway-sso-web  # 标签
+    spec:
+      containers:
+      - name: gateway-sso-web  # 容器名称
+        image: harbor.dev.wh.digitalchina.com/wenlvma/$PROJECT_IMAGE  # 镜像
+        imagePullPolicy: Always # 镜像拉取策略 无论本地是否存在，总是拉取
+        ports:
+        - containerPort: 9099  # 端口号
+          name: gateway-sso-web  # 名称
+          protocol: TCP  # 协议
+      imagePullSecrets:
+        - name: harbor-xiaocpa-qafvw
+      dnsPolicy: ClusterFirst  # dRancherNamespace规则
+---
+# 创建Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: service-gateway-sso-web  # service名称
+  namespace: wenlvma-gateway-sso-web
+spec:
+  ports:
+  - port: 9099
+    protocol: TCP
+    targetPort: 9099
+  selector:
+    workloadselector: deployment-wenlvma-gateway-sso-web
+  type: NodePort
+---
+# 创建ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-gateway-sso-web  # ingress名称
+  namespace: wenlvma-gateway-sso-web  # 命名空间
+spec:
+  rules:
+  - host: wenlvma-gateway-sso-web.dev.wh.digitalchina.com  #设置访问地址
+    http:
+      paths:
+      - backend:
+          serviceName: service-gateway-sso-web  # 服务名称
+          servicePort: 80  # 访问端口
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - wenlvma-gateway-sso-web.dev.wh.digitalchina.com
+    secretName: whdc-cert

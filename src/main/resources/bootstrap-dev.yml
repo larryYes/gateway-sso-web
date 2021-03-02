@@ -1,0 +1,87 @@
+spring:
+  profiles:
+    # discovery-registry和discovery-local，不使用nacos就写 discovery-local，走url调用服务
+    include: discovery-registry
+  cloud:
+    gateway:
+      httpclient:
+        response-timeout: 60s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            # 允许携带认证信息
+            # 允许跨域的源(网站域名/ip)，设置*为全部
+            # 允许跨域请求里的head字段，设置*为全部
+            # 允许跨域的method， 默认为GET和OPTIONS，设置*为全部
+            # 跨域允许的有效期
+            allowCredentials: true
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
+            maxAge: 3600
+      discovery:
+      locator:
+        enabled: true
+        lower-case-service-id: true
+      routes:
+        # 统一门户用户中心
+        - id: service-auth
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/auth/authenticate
+        - id: service-user
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/user/currentuser
+        - id: system-service
+          uri: lb://system-service
+          predicates:
+            - Path=/system/config
+        - id: service-logout
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/user/logout
+        # 统一门户用户中心
+        - id: service-portal-user
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/portal/**
+          filters:
+            - StripPrefix=1
+            #- CurrentUserFilter
+            #- LogoutUserFilter
+        - id: gateway-wxapp
+          uri: lb://gateway-wxapp
+          predicates:
+            - Path=/ymt-oms/**
+  redis:
+    host: 192.168.238.133
+    port: 6379
+    timeout: 3s
+    database: 1
+    password:
+    jedis:
+      pool:
+        max-idle: 500
+        min-idle: 50
+        max-wait: 2s
+        max-active: 1000
+
+#服务注册
+bestjoy:
+  discovery:
+    #nacos地址
+    server-addr: localhost:8848
+    #注册的服务名，一定要和spring.application.name一致
+    service-name: ${spring.application.name}
+
+gateway:
+  cookie:
+    domain: .tyymt.com
+  redirect:
+    loginUrl: http://www.baidu.com
+  ignore:
+    authentication:
+      currentUser: /user/currentuser
+      logout: /user/logout
+      startWith: /auth/authenticate

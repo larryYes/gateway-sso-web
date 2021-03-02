@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>labrador-cloud-framework</artifactId>
+        <groupId>net.bestjoy</groupId>
+        <version>1.1.0-WENLVMA</version>
+        <!--注意这里请不要使用相对路径标签： <relativePath/> -->
+    </parent>
+    <groupId>com.tyymt.wxplatform</groupId>
+    <artifactId>gateway-sso-web</artifactId>
+    <version>1.1.0.RELEASE</version>
+    <name>gateway-sso-web</name>
+    <description>Demo project for Spring Boot</description>
+
+    <!--版本属性-->
+    <properties>
+        <java.version>1.8</java.version>
+        <labrador.cloud.version>1.1.0-WENLVMA</labrador.cloud.version>
+        <spring-cloud-gateway.version>2.1.1.RELEASE</spring-cloud-gateway.version>
+    </properties>
+
+    <!--引入基础框架的服务发现和web模块-->
+    <dependencies>
+        <dependency>
+            <groupId>net.bestjoy</groupId>
+            <artifactId>labrador-cloud-discovery</artifactId>
+            <version>${labrador.cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bestjoy</groupId>
+            <artifactId>labrador-cloud-core</artifactId>
+            <version>${labrador.cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bestjoy</groupId>
+            <artifactId>labrador-cloud-cache</artifactId>
+            <version>${labrador.cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bestjoy</groupId>
+            <artifactId>labrador-cloud-logger</artifactId>
+            <version>${labrador.cloud.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <version>${spring-cloud-gateway.version}</version>
+        </dependency>
+
+        <!-- Spring boot actuator to expose metrics endpoint -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- Micormeter core dependecy -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
+        <!-- Micrometer Prometheus registry -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!--依赖管理-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>net.bestjoy</groupId>
+                <artifactId>labrador-cloud-dependencies</artifactId>
+                <version>${labrador.cloud.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArguments>
+                        <Xlint/>
+                        <verbose/>
+                        <bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
+                    </compilerArguments>
+                    <verbose>true</verbose>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,166 @@
+spring:
+  profiles:
+    include: discovery-registry
+  cloud:
+    gateway:
+      httpclient:
+        response-timeout: 60s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowCredentials: true
+            allowedHeaders: "*"
+            allowedMethods: "*"
+            maxAge: 3600
+      discovery:
+      locator:
+        enabled: true
+        lower-case-service-id: true
+      routes:
+        # 统一门户用户中心
+        - id: service-auth
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/auth/authenticate
+        - id: service-user
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/user/currentuser
+        - id: system-service
+          uri: lb://system-service
+          predicates:
+            - Path=/system/config
+        - id: service-logout
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/user/logout
+        # 统一门户用户中心
+        - id: service-portal-user
+          uri: lb://service-portal-user
+          predicates:
+            - Path=/portal/**
+          filters:
+            - StripPrefix=1
+        # 清分
+        - id: service-settlebench
+          uri: http://10.208.4.4:8008/
+          predicates:
+            - Path=/bsms-settlebench-web/**
+        # 景区B端
+        - id: oms-scenic-wl
+          uri: http://oms-scenicspot.ymt-oms.svc.cluster.local:9088/
+          predicates:
+            - Path=/ymt-oms/sadmin/**
+        # 酒店订单B端
+        - id: oms-hotel
+          uri: http://oms-hotel.ymt-oms.svc.cluster.local:9081/
+          predicates:
+            - Path=/ymt-oms/hotelOrderAdmin/**
+        #中云
+        - id: service-scenic-admin
+          uri: http://zywx-scenicspots-admin.zywx.svc.cluster.local:8080/
+          predicates:
+            - Path=/scenicAdmin/**
+        - id: service-cache
+          uri: http://172.16.95.95:8080/
+          predicates:
+            - Path=/cache/**
+        - id: service-cos
+          uri: http://172.16.95.179:8080/
+          predicates:
+            - Path=/cos/**
+        - id: service-hoteladmin
+          uri: http://zywx-hotel-admin.zywx.svc.cluster.local:8080/
+          predicates:
+            - Path=/hoteladmin/**
+        - id: service-dictionary-room-facility
+          uri: http://172.16.95.179:8080/
+          predicates:
+            - Path=/dictionaryRoomFacility/**
+        # 支付
+        - id: service-pay-center
+          uri: http://10.208.4.4:8008/
+          predicates:
+            - Path=/payCenter/**
+        # 二维码
+        - id: qrcode-mgr-client
+          uri: http://qrcode-mgr-client.ccm-qrcode-wuhan.svc.cluster.local:28702/
+          predicates:
+            - Path=/qrcode/**
+        # 出租车
+        - id: taxi-service
+          uri: http://taxi-control-backend.wuhan-travel-pro.svc.cluster.local/
+          predicates:
+            - Path=/taxi/**
+        # 租车
+        - id: rent-service
+          uri: http://rent-control-backend.wuhan-travel-pro.svc.cluster.local/
+          predicates:
+            - Path=/rent/**
+        # 用户
+        - id: user-service
+          uri: http://user-service-prd.user-service.svc.cluster.local:8090/
+          predicates:
+            - Path=/user/**
+        #景区美团ota对接
+        - id: ota-meituan-admin
+          uri: http://oms-ota-meituan.ymt-oms.svc.cluster.local:9000/
+          predicates:
+            - Path=/ota-mt/**
+        #景区携程ota对接
+        - id: oms-ota-xc
+          uri: http://oms-ota-xc.ymt-oms.svc.cluster.local:9081
+          predicates:
+            - Path=/ota-ctrip/omsOrders/**
+        #景区同程ota
+        - id: oms-ota-tc
+          uri: http://oms-ota-tc.ymt-oms.svc.cluster.local:9081
+          predicates:
+            - Path=/scenic-ota-tc/scenicSpotAdmin/**
+        #轮渡配置
+        - id: ferry-config
+          uri: http://ferry-config.ferry-bm.svc.cluster.local:8080
+          predicates:
+            - Path=/ferry-config/admin/**
+        #发票管理
+        - id: fapiao-admin
+          uri: http://fapiao-admin.fapiao.svc.cluster.local:18080/
+          predicates:
+            - Path=/einvoiceadmin/**
+    #nacos账号密码
+    nacos:
+      discovery:
+        username: dcone
+        password: DrqkP4PAnDTOqo4u
+  redis:
+    host: 10.207.44.8
+    port: 6379
+    timeout: 3s
+    database: 3
+    password: gE0g6PqYN&s0w
+    jedis:
+      pool:
+        max-idle: 16
+        min-idle: 8
+        max-wait: 2s
+        max-active: 1000
+
+#服务注册
+bestjoy:
+  discovery:
+    #nacos地址
+    server-addr: 10.204.10.11:8848
+    #注册的服务名，一定要和spring.application.name一致
+    service-name: ${spring.application.name}
+    namespace: c4390d32-54b5-4a7d-9569-03bab4b02c14
+
+gateway:
+  cookie:
+    domain: .tyymt.com
+  redirect:
+    loginUrl: https://ssoweb.tyymt.com/system/index
+  ignore:
+    authentication:
+      currentUser: /user/currentuser
+      logout: /user/logout
+      startWith: /auth/authenticate

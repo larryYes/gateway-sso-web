@@ -1,0 +1,29 @@
+spring:
+  profiles:
+    # discovery-registry和discovery-local，不使用nacos就写 discovery-local，走url调用服务
+    include: discovery-local
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    #数据库地址
+    url: jdbc:mysql://localhost:3306/framework_test?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    #数据库账号
+    username: root
+    #数据库密码
+    password: 123456
+    #hikari连接池
+    hikari:
+      #2*cpu
+      maximum-pool-size: 16
+      #cpu
+      minimum-idle: 8
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        
+#feign的url
+service-user:
+  url:
+    remoteUrl: localhost:9090
